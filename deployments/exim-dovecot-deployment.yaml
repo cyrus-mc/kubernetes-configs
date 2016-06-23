@@ -1,0 +1,80 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: email
+#  namespace: journaling
+  # labels can be applied automatically
+  # from the labels in the pod template if not set
+  # labels:
+  #   app: postgres
+  #   role: master
+  #   tier: backend
+spec:
+  # this replicas value is default
+  # modify it according to your case
+  replicas: 1
+  # selector can be applied automatically
+  # from the labels in the pod template if not set
+  # selector:
+  #   matchLabels
+  #     app: postgres
+  #     role: master
+  #     tire: backend
+  template:
+    metadata:
+      labels:
+        app: exim-dovecot
+        role: smtp
+        tier: frontend
+    spec:
+      containers:
+      - name: exim
+        image: cyrusmc/exim_journal
+        ports:
+        - containerPort: 25
+          name: smtp
+          protocol: TCP
+        env:
+        - name: LOOKUP_DB_HOST
+          value: psql-db.default
+        - name: LOOKUP_DB_PORT
+          value: '6432'
+        - name: LOOKUP_DB_NAME
+          value: accounts
+        - name: LOOKUP_DB_USER
+          value: read_only
+        - name: LOOKUP_DB_PASS
+          value: accounts
+        volumeMounts:
+          - mountPath: '/mail'
+            name: data
+          - mountPath: '/var/log'
+            name: logs
+      - name: dovecot
+        image: cyrusmc/dovecot_journal
+        ports:
+        - containerPort: 143
+          name: imap
+          protocol: TCP
+        env:
+        - name: LOOKUP_DB_HOST
+          value: psql-db.default
+        - name: LOOKUP_DB_PORT
+          value: '6432'
+        - name: LOOKUP_DB_NAME
+          value: accounts
+        - name: LOOKUP_DB_USER
+          value: read_only
+        - name: LOOKUP_DB_PASS
+          value: accounts
+        volumeMounts:
+          - mountPath: '/mail'
+            name: data
+          - mountPath: '/var/log'
+            name: logs
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: logs
+          hostPath:
+            path: /mnt/docker/logs

@@ -1,0 +1,34 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: logstash
+spec:
+  template:
+    metadata:
+      labels:
+        app: logstash
+      name: logstash
+    spec:
+      nodeSelector:
+        nodeType: worker
+      containers:
+      - image: logstash:latest
+        imagePullPolicy: Always
+        name: logstash
+        args:
+        - 'logstash'
+        - 'agent'
+        - '-f'
+        - '/config-dir/logstash.conf'
+        volumeMounts:
+          - name: config
+            mountPath: /config-dir
+          - name: logs
+            mountPath: /logs
+      volumes:
+        - hostPath:
+            path: /mnt/docker/configuration
+          name: config
+        - hostPath:
+            path: /mnt/docker/logs
+          name: logs

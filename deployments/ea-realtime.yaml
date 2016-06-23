@@ -1,0 +1,62 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ea-realtime
+#  namespace: journaling
+  # labels can be applied automatically
+  # from the labels in the pod template if not set
+  # labels:
+  #   app: postgres
+  #   role: master
+  #   tier: backend
+spec:
+  # this replicas value is default
+  # modify it according to your case
+  replicas: 1
+  # selector can be applied automatically
+  # from the labels in the pod template if not set
+  # selector:
+  #   matchLabels
+  #     app: postgres
+  #     role: master
+  #     tire: backend
+  template:
+    metadata:
+      labels:
+        role: ea-realtime
+        tier: frontend
+    spec:
+      containers:
+      - name: memcached
+        image: memcached
+        ports:
+        - containerPort: 11211
+          name: memcached
+          protocol: TCP
+      - name: ea-realtime
+        image: cyrusmc/ea_realtime
+        securityContext:
+          capabilities:
+            add:
+            - SYS_ADMIN
+          privileged: true
+        env:
+        - name: JDBC_CONNECTION_URL
+          value: 'jdbc:sqlserver://dev-db-01.smarshdev.com\devdb;databaseName=Smarsh;applicationName=EAR'
+        - name: JDBC_USERNAME
+          value: 'EmailArchiver'
+        - name: JDBC_PASS
+          value: 'Bm5d0aGlvmYjuga'
+        - name: JDBC_SECONDARY_CONNECTION_URL
+          value: 'jdbc:sqlserver://dev-db-02.smarshdev.com\devdb;databaseName=Smarsh;applicationName=EAR'
+        volumeMounts:
+          - mountPath: '/mail'
+            name: data
+          - mountPath: '/var/log'
+            name: logs
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: logs
+          hostPath:
+            path: /mnt/docker/logs

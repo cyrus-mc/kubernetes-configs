@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: testbox
+  namespace: journaling
+spec:
+  containers:
+  - image: cyrusmc/testbox
+    command:
+      - sleep
+      - "3600"
+    name: busybox
+    env:
+      - name: MY_NODE_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP

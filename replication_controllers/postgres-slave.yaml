@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: postgres-slave
+  namespace: journaling
+spec:
+  replicas: 1
+  selector:
+    database: postgres
+    version: 9.3.13
+    role: slave
+  template:
+    metadata:
+      labels:
+        database: postgres
+        role: slave
+        version: 9.3.13
+    spec:
+      containers:
+      - name: dbslave
+        image: cyrusmc/postgres_slave
+        ports:
+        - containerPort: 5432
+          name: postgres
+          protocol: TCP
+        env:
+        - name: POSTGRES_MASTER_SERVER
+          value: master-db-service.journaling
+      - name: pgbouncer
+        image: cyrusmc/pgbouncer
+        ports:
+        - containerPort: 6432
+          name: pgbouncer
+          protocol: TCP
+        env:
+        - name: POSTGRES_DATABASE
+          value: accounts

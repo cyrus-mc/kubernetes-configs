@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: exim-journal
+  namespace: default
+spec:
+  containers:
+  - name: journal-database
+    image: cyrusmc/journal_db
+    ports:
+      - name: postgresql
+        hostPort: 5432
+        containerPort: 5432
+        protocol: TCP
+  - name: journal-web
+    image: cyrusmc/journal_django
+    ports:
+      - name: django
+        hostPort: 8000
+        containerPort: 8000
+        protocol: TCP
+  - name: exim
+    image: cyrusmc/exim_journal
+    ports:
+      - name: smtp
+        hostPort: 25
+        containerPort: 25
+        protocol: TCP
+  - name: dovecot
+    image: cyrusmc/dovecot_journal
+    ports:
+      - name: pop3
+        hostPort: 110
+        containerPort: 110
+        protocol: TCP
+      - name: imap
+        hostPort: 143
+        containerPort: 143
+        protocol: TCP
+      - name: pop3s
+        hostPort: 993
+        containerPort: 993
+        protocol: TCP
+      - name: imaps
+        hostPort: 995
+        containerPort: 995
+        protocol: TCP 

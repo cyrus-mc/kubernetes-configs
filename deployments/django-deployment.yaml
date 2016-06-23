@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: django
+#  namespace: journaling
+  # labels can be applied automatically
+  # from the labels in the pod template if not set
+  # labels:
+  #   app: postgres
+  #   role: master
+  #   tier: backend
+spec:
+  # this replicas value is default
+  # modify it according to your case
+  replicas: 1
+  # selector can be applied automatically
+  # from the labels in the pod template if not set
+  # selector:
+  #   matchLabels
+  #     app: postgres
+  #     role: master
+  #     tire: backend
+  template:
+    metadata:
+      labels:
+        app: admin
+        role: django
+        tier: frontend
+    spec:
+      containers:
+      - name: django
+        image: cyrusmc/django
+        ports:
+        - containerPort: 8000
+          name: web
+          protocol: TCP
+        env:
+        - name: DATABASE_HOST
+          value: psql-master.default
+        - name: DATABASE_NAME
+          value: accounts
+        - name: DATABASE_USER
+          value: read_only
+        - name: DATABASE_PASS
+          value: accounts

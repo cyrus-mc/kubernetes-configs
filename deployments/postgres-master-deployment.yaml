@@ -1,0 +1,76 @@
+# create namespace
+#apiVersion: v1
+#kind: Namespace
+#metadata:
+#  name: journaling
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: postgres-master
+#  namespace: journaling
+  # labels can be applied automatically
+  # from the labels in the pod template if not set
+  # labels:
+  #   app: postgres
+  #   role: master
+  #   tier: backend
+spec:
+  # this replicas value is default
+  # modify it according to your case
+  replicas: 1
+  # selector can be applied automatically
+  # from the labels in the pod template if not set
+  # selector:
+  #   matchLabels
+  #     app: postgres
+  #     role: master
+  #     tire: backend
+  template:
+    metadata:
+      labels:
+        app: postgres
+        role: master
+        tier: backend
+    spec:
+      containers:
+      - name: psql-master
+        image: postgres:9.3.13
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 5432
+          name: postgres
+          protocol: TCP
+        env:
+        - name: DB_NAME
+          value: accounts
+        - name: DB_PASS
+          value: accounts
+        - name: DB_USER
+          value: read_only
+        volumeMounts:
+        - name: scripts
+          mountPath: /docker-entrypoint-initdb.d
+          readOnly: true
+      - name: pgbouncer
+        image: cyrusmc/pgbouncer
+        ports:
+        - containerPort: 6432
+          name: pgbouncer
+          protocol: TCP
+        env:
+        - name: PGBOUNCER_AUTH_TYPE
+          value: plain
+        - name: POSTGRES_DATABASE
+          value: accounts
+        - name: POSTGRES_USER
+          value: read_only
+        - name: POSTGRES_PASS
+          value: accounts
+      volumes:
+      - name: scripts
+        hostPath:
+          path: /mnt/docker/database/master

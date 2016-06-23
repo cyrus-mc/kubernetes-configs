@@ -1,0 +1,58 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: netdata
+  namespace: kube-system
+  # labels can be applied automatically
+  # from the labels in the pod template if not set
+  # labels:
+  #   app: postgres
+  #   role: master
+  #   tier: backend
+spec:
+  # this replicas value is default
+  # modify it according to your case
+  replicas: 1
+  # selector can be applied automatically
+  # from the labels in the pod template if not set
+  # selector:
+  #   matchLabels
+  #     app: postgres
+  #     role: master
+  #     tire: backend
+  template:
+    metadata:
+      labels:
+        role: monitoring
+        tier: frontend
+    spec:
+      containers:
+      - name: netdata
+        image: titpetric/netdata
+        ports:
+        - containerPort: 19999
+          name: netdata
+          protocol: TCP
+        volumeMounts:
+        - name: proc
+          mountPath: /host/proc
+          readOnly: true
+        - name: sys
+          mountPath: /host/sys
+          readOnly: true
+        - name: docker
+          mountPath: /var/run/docker.sock
+        securityContext:
+          capabilities:
+            add:
+            - SYS_PTRACE
+      volumes:
+      - name: proc
+        hostPath:
+          path: /proc
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: docker
+        hostPath:
+          path: /var/run/docker.sock

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: journal
+#  namespace: journaling
+spec:
+  selector:
+    app: admin
+    role: django
+    tier: frontend
+  ports:
+  - port: 8000
+    name: http
+    protocol: TCP
+  externalIPs:
+  - 10.200.18.34
+  - 10.200.18.35
+  - 10.200.18.36
