@@ -1,0 +1,37 @@
+# A headless service to create DNS records
+apiVersion: v1
+kind: Service
+metadata:
+  name: memcache
+  labels:
+    app: memcache
+spec:
+  ports:
+  - port: 11211
+    name: daemon
+  # *.nginx.default.svc.cluster.local
+  clusterIP: None
+  selector:
+    app: memcache
+---
+apiVersion: apps/v1alpha1
+kind: PetSet
+metadata:
+  name: memcache
+spec:
+  serviceName: "memcache"
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: memcache
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+      - name: memcache
+        image: memcached:alpine
+        ports:
+        - containerPort: 11211
+          name: daemon

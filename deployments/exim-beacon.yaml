@@ -1,7 +1,8 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: motorboat
+  name: email
+#  namespace: journaling
   # labels can be applied automatically
   # from the labels in the pod template if not set
   # labels:
@@ -22,13 +23,14 @@ spec:
   template:
     metadata:
       labels:
-        role: motorboat
-        tier: backend
+        app: exim
+        role: smtp
+        tier: frontend
     spec:
       containers:
-      - name: "motorboat"
-        image: "b.gcr.io/kuar/motorboat:0.0.1"
-        args:
-          - "--api-server=k8s-ctrl-04.ost.smarshqa.com:8080"
-          - "--nginx-server=localhost:80"
-          - "--nginx-status-server=localhost:8080"
+      - name: exim
+        image: quay.io/smarsh/exim
+        ports:
+        - containerPort: 25
+          name: smtp
+          protocol: TCP

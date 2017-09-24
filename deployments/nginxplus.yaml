@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: motorboat
+  name: nginxplus
   # labels can be applied automatically
   # from the labels in the pod template if not set
   # labels:
@@ -22,13 +22,14 @@ spec:
   template:
     metadata:
       labels:
-        role: motorboat
-        tier: backend
+        role: nginxplus
+        tier: frontend
     spec:
       containers:
-      - name: "motorboat"
-        image: "b.gcr.io/kuar/motorboat:0.0.1"
-        args:
-          - "--api-server=k8s-ctrl-04.ost.smarshqa.com:8080"
-          - "--nginx-server=localhost:80"
-          - "--nginx-status-server=localhost:8080"
+      - name: "nginxplus"
+        #image: "b.gcr.io/kuar/motorboat:0.0.1"
+        image: "cyrusmc/nginxplus"
+        #args:
+        #  - "--api-server=kube-master-01.ost.smarshdev.com:8080"
+        #  - "--nginx-server=localhost:80"
+        #  - "--nginx-status-server=localhost:8080"

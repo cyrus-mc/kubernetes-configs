@@ -1,0 +1,40 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: jenkins-slave
+spec:
+  # this replicas value is default
+  # modify it according to your case
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: exim-dovecot
+        role: smtp
+        tier: frontend
+    spec:
+      containers:
+      - name: tcpdump
+        image: quay.io/smarsh/tcpdump
+#        command:
+#        - '/bin/sleep'
+#        - '60000'
+        volumeMounts:
+        - mountPath: '/data'
+          name: data
+      - name: jenkins-slave
+        image: jenkinsci/jnlp-slave
+        command:
+        - "/bin/sleep"
+        - "600000"
+        env:
+        - name: JENKINS_URL
+          value: 'http://beacon-jenkins.default.svc.cluster.local'
+        - name: JENKINS_NAME
+          value: 'qa-k8s-node'
+        - name: JENKINS_SECRET
+          value: '8b6e3a67b4122e7a739ce2a11140ab40544e37597a8fb3ec5e149149ccfd75cc'
+      volumes:
+      - name: data
+        hostPath:
+          path: /tmp/data

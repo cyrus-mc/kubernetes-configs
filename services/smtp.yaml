@@ -1,11 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ingress
-#  namespace: journaling
+  name: smtp
 spec:
-#  clusterIP: None
-#  type: NodePort
+  clusterIP: None
   selector:
     app: exim-dovecot
     role: smtp
@@ -17,7 +15,3 @@ spec:
   - port: 143
     name: imap
     protocol: TCP
-  externalIPs:
-  - 10.200.3.128
-  - 10.200.3.133
-  - 10.200.3.134

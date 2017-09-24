@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: jenkins-slave
+spec:
+  # this replicas value is default
+  # modify it according to your case
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: k8s-jnlp-slave
+    spec:
+      containers:
+      - name: jnlp-slave
+        image: quay.io/smarsh/jnlp-slave:3.10-1-alpine-cluster
+        imagePullPolicy: Always
+        #command:
+        #- "/bin/sleep"
+        #- "600000"
+        env:
+        - name: JENKINS_URL
+          value: 'http://jenkins.services.aws'
+        - name: JENKINS_NAME
+          value: 'dev-k8s-node'
+        - name: JENKINS_SECRET
+          value: '4e8496bfac219bedc3d61dfc779b78579443a8801af23f32ed8965a35c8501b2'

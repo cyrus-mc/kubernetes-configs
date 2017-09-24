@@ -1,8 +1,24 @@
-# create namespace
-#apiVersion: v1
-#kind: Namespace
-#metadata:
-#  name: journaling
+apiVersion: v1
+kind: Service
+metadata:
+  name: psql-master
+#  namespace: journaling
+spec:
+  selector:
+    app: postgres
+    role: master
+    tier: backend
+  ports:
+  - port: 5432
+    name: postgres
+    protocol: TCP
+  - port: 6432
+    name: pgbouncer
+    protocol: TCP
+
+
+---
+
 
 apiVersion: extensions/v1beta1
 kind: Deployment

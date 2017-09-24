@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prr-configuration
+  namespace: default
+data:
+  credentials.properties: |-
+    datasource.defaultDataSource.password=OO77Tgtgg$$21@VCPAT
+    datasource.rulesDataSource.password=OO77Tgtgg$$21@VCPAT
+    datasource.secureViewDataSource.password=OO77Tgtgg$$21@VCPAT
+    default.vault.authorization.password=3Zv5w@W*PAJxpoy
+    datastore.password=0

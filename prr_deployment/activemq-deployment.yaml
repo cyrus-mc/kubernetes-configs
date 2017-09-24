@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: activemq
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: activemq
+    spec:
+      containers:
+      - name: activemq
+        image: cyrusmc/activemq:latest
+#        over-ride entrypoint command
+        command:
+        - "/usr/bin/sleep"
+        - "600000"
+        env:
+        - name: ROLE
+          value: prr
+        volumeMounts:
+          - name: git-volume
+            mountPath: /configuration
+      volumes:
+      - name: git-volume
+        gitRepo:
+          repository: "https://pit-gitlab-01.smarshinc.com/TechOps/activeMQ_config.git"
+          directory: git

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: docker
+  namespace: default
+spec:
+#  securityContext:
+#    supplementalGroups:
+#      - 10
+#      - 20
+  containers:
+  - image: docker
+    #command:
+    #  - sleep
+    #  - "3600"
+    imagePullPolicy: IfNotPresent
+    name: docker
+    #securityContext:
+    #  runAsUser: 10
+    #  runAsNonRoot: true
+    volumeMounts:
+     - name: docker-sock
+       mountPath: /var/run/docker.sock
+       readOnly: true
+  restartPolicy: Always
+  volumes:
+   - hostPath:
+       path: /var/run/docker.sock
+     name: docker-sock

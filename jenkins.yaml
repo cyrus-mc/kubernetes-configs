@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: jenkins-master
+  namespace: default
+  # labels can be applied automatically
+  # from the labels in the pod template if not set
+  # labels:
+  #   app: jenkins
+spec:
+  # this replicas value is default
+  # modify it according to your case
+  replicas: 1
+  # selector can be applied automatically
+  # from the labels in the pod template if not set
+  # selector:
+  #   matchLabels
+  #     app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+        role: master
+    spec:
+      containers:
+      - name: jenkins-master
+        image: jenkinsci/blueocean:latest
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        - containerPort: 50000
+          name: jmx
+          protocol: TCP
+        volumeMounts:
+        - name: jenkins-home
+          mountPath: /var/jenkins_home
+      volumes:
+      - name: jenkins-home
+        nfs:
+          path: "/vol/qa/jenkins_home"
+          server: "qa-nanfs-01.smarshqa.com"

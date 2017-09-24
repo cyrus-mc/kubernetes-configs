@@ -1,0 +1,68 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: prereviewer
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prr
+    spec:
+      containers:
+      - name: prr
+        image: cyrusmc/prr:latest
+#        over-ride entrypoint command
+#        command:
+#        - "/usr/bin/sleep"
+#        - "60000"
+        env:
+        - name: RUN_AS_USER
+          value: ei_obscan 
+        - name: DS_DEFAULT_PWD
+          valueFrom:
+            secretKeyRef:
+              name: prr-secrets
+              key: datasource.defaultDataSource.password
+        - name: DS_RULES_PWD
+          valueFrom:
+            secretKeyRef:
+              name: prr-secrets
+              key: datasource.rulesDataSource.password
+        - name: DS_SECURE_PWD
+          valueFrom:
+            secretKeyRef:
+              name: prr-secrets
+              key: datasource.secureViewDataSource.password
+        - name: VAULT_PWD
+          valueFrom:
+            secretKeyRef:
+              name: prr-secrets
+              key: default.vault.authorization.password
+        volumeMounts:
+          - name: git-volume
+            mountPath: /configuration
+          - name: nfs-volume
+            mountPath: /mnt/Maildir
+#          - name: prr-credentials
+#            mountPath: /configuration/maps
+#        securityContext:
+#          capabilities:
+#            add:
+#            - SYS_ADMIN
+#          privileged: true
+      volumes:
+      - name: git-volume
+        gitRepo:
+          repository: "https://pit-gitlab-01.smarshinc.com/TechOps/prereviewer_configuration.git"
+          directory: git
+      - name: nfs-volume
+        nfs:
+          path: /vol/development/dlp
+          server: dev-nanfs-01.smarshdev.com
+#      - name: prr-credentials
+#        configMap:
+#          name: prr-configuration
+#          items:
+#          - key: credentials.properties
+#            path: credentials.properties

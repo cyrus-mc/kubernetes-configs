@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: maven-repo
+  annotations:
+    volume.beta.kubernetes.io/storage-class: efs
+    volume.beta.kubernetes.io/mount-options: "nfsvers=4.1"
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /
+    server: fs-2599428c.efs.us-west-2.amazonaws.com

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: postgres
+  namespace: fetchdb-pipeline-15
+spec:
+  containers:
+  - image: localhost:5000/beacon-fetchdb
+    command:
+      - sleep
+      - "3600"
+    imagePullPolicy: IfNotPresent
+    name: postgres

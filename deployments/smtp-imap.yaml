@@ -8,6 +8,7 @@ spec:
     app: exim-dovecot
     role: smtp
     tier: frontend
+  type: LoadBalancer
   ports:
   - port: 25
     name: smtp
@@ -23,7 +24,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: email
+  name: smtp-imap
 #  namespace: journaling
   # labels can be applied automatically
   # from the labels in the pod template if not set
@@ -58,7 +59,7 @@ spec:
           protocol: TCP
         env:
         - name: LOOKUP_DB_HOST
-          value: psql-db.default
+          value: psql-db.default.svc.cluster.local
         - name: LOOKUP_DB_PORT
           value: '6432'
         - name: LOOKUP_DB_NAME
@@ -96,7 +97,8 @@ spec:
             name: logs
       volumes:
         - name: data
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: claim1
         - name: logs
           hostPath:
             path: /mnt/docker/logs

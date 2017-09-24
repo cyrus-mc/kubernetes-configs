@@ -1,0 +1,68 @@
+# a headless server to create DNS records
+apiVersion: v1
+kind: Service
+metadata:
+  name: memcached
+  labels:
+    app: memcached
+spec:
+  ports:
+  - port: 11211
+    name: memcache
+  clusterIP: None
+  selector:
+    app: memcached
+
+---
+
+apiVersion: apps/v1alpha1
+kind: PetSet
+metadata:
+  name: memcache
+  annotations:
+spec:
+  serviceName: "memcached"
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: memcached
+      annotations:
+        pod.beta.kubernetes.io/init-containers: '[
+            {
+                "name": "install",
+                "image": "busybox",
+                "command": [ "echo", "test", ">", "/work-dir/what-the-fuck" ],
+                "volumeMounts": [
+                    {
+                        "name": "workdir",
+                        "mountPath": "/work-dir"
+                    }
+                ]
+            }
+        ]'
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+      - name: memcached
+        image: memcached:alpine
+        ports:
+        - containerPort: 11211
+          name: memcache
+        volumeMounts:
+        - name: workdir
+          mountPath: /mountpath
+        env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+      volumes:
+      - name: workdir
+        emptyDir: {}
+
